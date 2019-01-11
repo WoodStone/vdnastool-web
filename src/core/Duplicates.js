@@ -40,9 +40,11 @@ class Duplicates extends Component {
     }
 
     getDirsFromHash(hash) {
-        axios.get("http://localhost:9000/hash/" + hash + "/dirs").then(r => {
-            this.setState({dirs: {...this.state.dirs, [hash]: r.data}})
-        })
+        if (!this.state.dirs[hash]) {
+            axios.get("http://localhost:9000/hash/" + hash + "/dirs").then(r => {
+                this.setState({dirs: {...this.state.dirs, [hash]: r.data}})
+            })
+        }
     }
 
     handleTableChange = (pagination, filters, sorter) => {
@@ -81,25 +83,27 @@ class Duplicates extends Component {
     render() {
 
         return (
-            <Table
-                size="small"
-                columns={columns}
-                rowKey={record => record.id}
-                dataSource={this.state.data}
-                pagination={this.state.pagination}
-                loading={this.state.loading}
-                onChange={this.handleTableChange}   
-                expandRowByClick={true}
-                onExpand={(expanded, record) => this.getDirsFromHash(record.hash)}
-                expandedRowRender={record => 
-                    <List
-                        size="small"
-                        header={<div>Path</div>}
-                        bordered
-                        dataSource={this.state.dirs[record.id]}
-                        renderItem={item => (<List.Item>{item.path}</List.Item>)}
-                    />}
-            />
+            <div>
+                <Table
+                    size="small"
+                    columns={columns}
+                    rowKey={record => record.id}
+                    dataSource={this.state.data}
+                    pagination={this.state.pagination}
+                    loading={this.state.loading}
+                    onChange={this.handleTableChange}   
+                    expandRowByClick={true}
+                    onExpand={(expanded, record) => this.getDirsFromHash(record.hash)}
+                    expandedRowRender={record => 
+                        <List
+                            size="small"
+                            header={<div>Path</div>}
+                            bordered
+                            dataSource={this.state.dirs[record.id]}
+                            renderItem={item => (<List.Item>{item.path}</List.Item>)}
+                        />}
+                />
+            </div>
         )
         
     }
